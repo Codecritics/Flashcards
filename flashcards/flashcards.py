@@ -1,3 +1,5 @@
+import re
+
 class Flashcard:
     def __init__(self, term, definition):
         self.term = term
@@ -12,8 +14,11 @@ class Flashcard:
 
 
 def main():
-    card = Flashcard("purchase", "buy")
-    print(card)
+    term = input()
+    definition = input()
+    card = Flashcard(term, definition)
+    answer = input()
+    print("right" if re.match(card.definition, answer) else "wrong")
 
 
 if __name__ == "__main__":
