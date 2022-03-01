@@ -1,3 +1,4 @@
+import argparse
 import json
 from collections import defaultdict
 from random import choice
@@ -98,14 +99,17 @@ def remove_card() -> None:
     print()
 
 
-def import_card() -> None:
+def import_card(file_to_import) -> None:
     global log_message
 
     file_msg = "File name:"
     print(file_msg)
     log_message += file_msg + "\n"
 
-    file_to_read = input()
+    if file_to_import is None:
+        file_to_read = input()
+    else:
+        file_to_read = file_to_import
     log_message += file_to_read + "\n"
     try:
         with open(file_to_read, 'r') as import_file:
@@ -123,14 +127,17 @@ def import_card() -> None:
         log_message += cards_loaded_msg + "\n \n"
 
 
-def export_card() -> None:
+def export_card(file_to_export) -> None:
     global log_message
 
     file_msg = "File name:"
     print(file_msg)
     log_message += file_msg + "\n"
 
-    file_to_write = input()
+    if file_to_export is None:
+        file_to_write = input()
+    else:
+        file_to_write = file_to_export
     log_message += file_to_write + "\n"
 
     with open(file_to_write, 'w') as export_file:
@@ -254,10 +261,13 @@ def reset_stats() -> None:
     print()
 
 
-def play() -> None:
+def play(args) -> None:
     global log_message
 
     while True:
+        if args.import_from:
+            import_card(args.import_from)
+
         menu_msg = "Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):"
         print(menu_msg)
         log_message += menu_msg + "\n"
@@ -266,8 +276,10 @@ def play() -> None:
 
         if user_choice not in ["add", "remove", "import", "export", "ask", "exit", "log", "hardest card",
                                "reset stats"]:
-            return play()
+            return play(args)
         if user_choice == "exit":
+            if args.export_to:
+                export_card(args.export_to)
             exit_msg = "Bye bye!"
             print(exit_msg)
             log_message += exit_msg + "\n"
@@ -277,9 +289,9 @@ def play() -> None:
         elif user_choice == "remove":
             remove_card()
         elif user_choice == "export":
-            export_card()
+            export_card(None)
         elif user_choice == "import":
-            import_card()
+            import_card(None)
         elif user_choice == "ask":
             check_cards()
         elif user_choice == "log":
@@ -294,7 +306,15 @@ log_message = ""
 
 
 def main():
-    play()
+    parser = argparse.ArgumentParser(description="This program interacts with the flashcards export \
+    and import file features.")
+
+    parser.add_argument("--import_from", help="Specify the txt name file to load the data from.")
+    parser.add_argument("--export_to", help="Specify the txt name file to save the data to. ")
+
+    args = parser.parse_args()
+
+    play(args)
 
 
 if __name__ == "__main__":
